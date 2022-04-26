@@ -7,7 +7,7 @@ import { fonts } from "styles"
 
 import { SolidData } from "math/polyhedra"
 import { hover } from "styles/common"
-import { mdiBrush, mdiDownload, mdiEarthArrowRight } from "@mdi/js"
+import { mdiBrush, mdiDownload } from "@mdi/js"
 import { defaultColors } from "components/configOptions"
 
 function formatDecimal(number: number) {
