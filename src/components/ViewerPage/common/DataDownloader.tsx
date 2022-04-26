@@ -45,9 +45,9 @@ function HexToRgb(hex: string) {
 function fToOff(face: number[]) {
   const faceHexColor: string = defaultColors[face.length]
   const faceRgb = HexToRgb(faceHexColor)
-  return (
-    face.map((i) => i + 1).join(" ") + ` ${faceRgb.r} ${faceRgb.g} ${faceRgb.b}`
-  )
+  return `${face.length} ${face.map((i) => i).join(" ")} ${faceRgb.r} ${
+    faceRgb.g
+  } ${faceRgb.b}`
 }
 
 function toObj({ vertices, faces }: SolidData) {
@@ -57,7 +57,7 @@ function toObj({ vertices, faces }: SolidData) {
 }
 
 function toOff({ vertices, faces }: SolidData) {
-  const header = `OFF\n${vertices.length} ${faces.length} 0\n`
+  const header = `OFF\n#Produced by https://polyhedra.tessera.li/\n${vertices.length} ${faces.length} 0`
   const vObj = vertices.map(vToOff)
   const fObj = faces.map(fToOff)
   return [header].concat(vObj).concat(fObj).join("\n")
@@ -110,14 +110,43 @@ function DownloadLink({
     },
   })
 
-  return (
-    <a {...css()} key={ext} download={filename} href={url}>
-      <SrOnly>Download as</SrOnly>.{ext}{" "}
-      <span>
-        <Icon path={mdiDownload} size={scales.size[1]} />
-      </span>
-    </a>
-  )
+  function openBrushApi(ext: string, solid: any) {
+    if (ext !== "off") return
+    const url = `http://localhost:40074/api/v1`
+    const data = new URLSearchParams()
+    data.append(`editablemodel.create.${ext}`, serializer(solid))
+    fetch(url, {
+      method: "post",
+      body: data,
+    })
+  }
+
+  let link
+  if (ext === "off") {
+    link = (
+      <a
+        {...css()}
+        key={ext}
+        href="javascript:void(0);"
+        onClick={() => openBrushApi(ext, solid)}
+      >
+        <SrOnly>Open Brush </SrOnly>.{ext}{" "}
+        <span>
+          <Icon path={mdiDownload} size={scales.size[1]} />
+        </span>
+      </a>
+    )
+  } else {
+    link = (
+      <a {...css()} key={ext} download={filename} href={url}>
+        <SrOnly>Download as</SrOnly>.{ext}{" "}
+        <span>
+          <Icon path={mdiDownload} size={scales.size[1]} />
+        </span>
+      </a>
+    )
+  }
+  return link
 }
 
 export default function DataDownloader({ solid }: Props) {
