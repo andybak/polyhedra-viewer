@@ -7,7 +7,7 @@ import { fonts } from "styles"
 
 import { SolidData } from "math/polyhedra"
 import { hover } from "styles/common"
-import { mdiDownload } from "@mdi/js"
+import { mdiBrush, mdiDownload, mdiEarthArrowRight } from "@mdi/js"
 import { defaultColors } from "components/configOptions"
 
 function formatDecimal(number: number) {
@@ -96,9 +96,10 @@ function DownloadLink({
   const css = useStyle({
     display: "inline-flex",
     justifyContent: "center",
+    cursor: "pointer",
     padding: scales.spacing[2],
     width: scales.size[4],
-
+    backgroundColor: "white",
     textDecoration: "none",
     border: "1px LightGray solid",
     color: "black",
@@ -124,17 +125,12 @@ function DownloadLink({
   let link
   if (ext === "off") {
     link = (
-      <a
-        {...css()}
-        key={ext}
-        href="javascript:void(0);"
-        onClick={() => openBrushApi(ext, solid)}
-      >
-        <SrOnly>Open Brush </SrOnly>.{ext}{" "}
+      <button {...css()} key={ext} onClick={() => openBrushApi(ext, solid)}>
+        Open Brush&nbsp;
         <span>
-          <Icon path={mdiDownload} size={scales.size[1]} />
+          <Icon path={mdiBrush} size={scales.size[1]} />
         </span>
-      </a>
+      </button>
     )
   } else {
     link = (
