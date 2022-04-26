@@ -8,6 +8,7 @@ import { fonts } from "styles"
 import { SolidData } from "math/polyhedra"
 import { hover } from "styles/common"
 import { mdiDownload } from "@mdi/js"
+import { defaultColors } from "components/configOptions"
 
 function formatDecimal(number: number) {
   return Number.isInteger(number) ? `${number}.0` : number
@@ -21,10 +22,45 @@ function fToObj(face: number[]) {
   return "f " + face.map((i) => i + 1).join(" ")
 }
 
+function vToOff(vertex: number[]) {
+  return vertex.map(formatDecimal).join(" ")
+}
+
+function HexToRgb(hex: string) {
+  const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i
+  hex = hex.replace(shorthandRegex, function (m, r, g, b) {
+    return r + r + g + g + b + b
+  })
+
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  return result
+    ? {
+        r: parseInt(result[1], 16) / 255,
+        g: parseInt(result[2], 16) / 255,
+        b: parseInt(result[3], 16) / 255,
+      }
+    : { r: 0, g: 0, b: 0 }
+}
+
+function fToOff(face: number[]) {
+  const faceHexColor: string = defaultColors[face.length]
+  const faceRgb = HexToRgb(faceHexColor)
+  return (
+    face.map((i) => i + 1).join(" ") + ` ${faceRgb.r} ${faceRgb.g} ${faceRgb.b}`
+  )
+}
+
 function toObj({ vertices, faces }: SolidData) {
   const vObj = vertices.map(vToObj)
   const fObj = faces.map(fToObj)
   return vObj.concat(fObj).join("\n")
+}
+
+function toOff({ vertices, faces }: SolidData) {
+  const header = `OFF\n${vertices.length} ${faces.length} 0\n`
+  const vObj = vertices.map(vToOff)
+  const fObj = faces.map(fToOff)
+  return [header].concat(vObj).concat(fObj).join("\n")
 }
 
 const fileFormats = [
@@ -35,6 +71,10 @@ const fileFormats = [
   {
     ext: "obj",
     serializer: toObj,
+  },
+  {
+    ext: "off",
+    serializer: toOff,
   },
 ]
 
